@@ -7,9 +7,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Baloo&display=swap" rel="stylesheet">
     <title>TO DO LIST</title>
+    <link rel="stylesheet" href="index.css">
 </head>
 
-<body class="relative min-h-[719px]  max-w-screen w-full">
+<body class="relative min-h-screen  max-w-screen w-full">
     
     <div class="video">
         <video autoplay loop muted class="  w-full min-h-screen object-cover -z-2">
@@ -27,12 +28,12 @@
             </div>
         </div>
         <div class=" flex items-center justify-center gap-[50px]  ">
-            <textarea name="" id="taskInput"
-                class="max-w-[622px] w-full h-[83px]  bg-[#C4BABA5E] border-[#FFFFFFB2] border-[1px] backdrop-blur-[32px]"></textarea>
+            <textarea  name="" id="taskInput"
+                class="max-w-[622px] w-full resize-none h-[83px] text-[40px] pt-[5px] px-2  bg-[#C4BABA5E] border-[#FFFFFFB2] border-[1px] backdrop-blur-[32px]"></textarea>
             <button>
                 <img id="addBtn" src="../videos_imgs/img 1.png" alt="button" class="cursor-pointer" >
             </button>
-            <select
+            <select id="filterSelect"
                 class=" max-w-[250px] w-full appearance-none  bg-[#C4BABA5E] backdrop-blur-[32px] border-[#FFFFFFB2] border-[1px] rounded-[2px] p-6 text-[24px] text-white font-weight-400">
                 <option class=" text-black ">ALL</option>
                 <option class=" text-black">Completed</option>
@@ -42,7 +43,7 @@
                 <img src="../videos_imgs/img 2.png" alt="dropdown" class="max-w-6 w-full">
             </div>
         </div>
-        <div id="taskList" class="flex flex-col gap-[20px] ml-[-280px]">
+        <div id="taskList" class="flex flex-col gap-[20px] ml-[-280px] max-h-[400px] overflow-y-auto  scrollbar-hide ">
          
     </section> 
     <div class="flex  absolute bottom-[24px] right-[111px]  ">
