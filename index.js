@@ -34,6 +34,7 @@ function renderTask(task) {
   p.id = `task${task.id}`;
   p.className = "text-white text-[40px] font-normal flex-1 break-all";
   p.textContent = task.text;
+  p.style.textDecoration = task.status === "completed" ? "line-through" : "none";
 
   const iconContainer = document.createElement("div");
   iconContainer.className = "flex gap-[10px] justify-center items-center flex-shrink-0";
@@ -43,12 +44,18 @@ function renderTask(task) {
   checkIcon.alt = "check";
   checkIcon.className = "max-w-[50px] w-full cursor-pointer";
 
+  const editIcon = document.createElement("img");
+  editIcon.src = "../videos_imgs/edit.jpg";
+  editIcon.alt = "edit";
+  editIcon.className = "max-w-[50px] w-[full] cursor-pointer";
+
   const deleteIcon = document.createElement("img");
   deleteIcon.src = "../videos_imgs/img 4 (repeat).png";
   deleteIcon.alt = "delete";
   deleteIcon.className = "max-w-[50px] w-full cursor-pointer";
 
   iconContainer.appendChild(checkIcon);
+  iconContainer.appendChild(editIcon);
   iconContainer.appendChild(deleteIcon);
 
   wrapper.appendChild(p);
@@ -65,7 +72,23 @@ function renderTask(task) {
     applyFilter();
   };
   checkIcon.addEventListener("click", showStatus);
-  
+
+  function editTask() {
+    p.contentEditable = true;
+    p.focus();
+  }
+  editIcon.addEventListener("click", editTask);
+  p.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      p.contentEditable = false;
+      task.text = p.textContent;
+      saveTasks();
+    }
+  });
+
+
+
   function deleteTask() {
     taskList.removeChild(wrapper);
     const index = tasks.findIndex(t => t.id === task.id);
@@ -73,25 +96,25 @@ function renderTask(task) {
     saveTasks();
   };
   deleteIcon.addEventListener("click", deleteTask);
-  }
+}
 function addTask(text) {
-      const trimmed = text.trim();
-      if (!trimmed) return;
+  const trimmed = text.trim();
+  if (!trimmed) return;
 
-      const newTask = { id: Date.now(), text: trimmed, status: "pending" };
-      tasks.push(newTask);
-      renderTask(newTask);
-      taskInput.value = "";
-      saveTasks();
-      applyFilter();
-    }
+  const newTask = { id: Date.now(), text: trimmed, status: "pending" };
+  tasks.push(newTask);
+  renderTask(newTask);
+  taskInput.value = "";
+  saveTasks();
+  applyFilter();
+}
 taskInput.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        addTask(taskInput.value);
-      }
-    });
-  addBtn.addEventListener("click", () => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
     addTask(taskInput.value);
-  });
-  tasks.forEach(renderTask);
+  }
+});
+addBtn.addEventListener("click", () => {
+  addTask(taskInput.value);
+});
+tasks.forEach(renderTask);
