@@ -44,10 +44,18 @@ function renderTask(task) {
   checkIcon.alt = "check";
   checkIcon.className = "max-w-[50px] w-full cursor-pointer";
 
-  const editIcon = document.createElement("img");
-  editIcon.src = "../videos_imgs/edit.jpg";
-  editIcon.alt = "edit";
-  editIcon.className = "max-w-[50px] w-[full] cursor-pointer";
+  const editIcon = document.createElement("i");
+  editIcon.className = "fa-solid fa-pen text-white text-[40px] cursor-pointer";
+  editIcon.style.display = task.status === "completed" ? "none" : "block";
+
+  const acceptIcon = document.createElement("i");
+  acceptIcon.className = "fa-solid fa-check text-white text-[40px] cursor-pointer";
+  acceptIcon.style.display = "none";
+
+  const rejectIcon = document.createElement("i");
+  rejectIcon.className = "fa-solid fa-xmark text-white text-[40px] cursor-pointer";
+  rejectIcon.style.display = "none";
+
 
   const deleteIcon = document.createElement("img");
   deleteIcon.src = "../videos_imgs/img 4 (repeat).png";
@@ -57,6 +65,8 @@ function renderTask(task) {
   iconContainer.appendChild(checkIcon);
   iconContainer.appendChild(editIcon);
   iconContainer.appendChild(deleteIcon);
+  iconContainer.appendChild(acceptIcon);
+  iconContainer.appendChild(rejectIcon);
 
   wrapper.appendChild(p);
   wrapper.appendChild(iconContainer);
@@ -68,53 +78,110 @@ function renderTask(task) {
     wrapper.dataset.status = task.status;
     checkIcon.src = task.status === "completed" ? "../videos_imgs/check_mark.png" : "../videos_imgs/img 3 (repeat).png";
     p.style.textDecoration = task.status === "completed" ? "line-through" : "none";
+    editIcon.style.display = task.status === "completed" ? "none" : "block";
     saveTasks();
     applyFilter();
   };
   checkIcon.addEventListener("click", showStatus);
 
+  let originalText = "";
   function editTask() {
+    if (task.status === "completed") {
+      return;
+    }
+    originalText = p.textContent;
     p.contentEditable = true;
     p.focus();
-  }
-  editIcon.addEventListener("click", editTask);
-  p.addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-      event.preventDefault();
+
+    checkIcon.style.display = "none";
+    editIcon.style.display = "none";
+    deleteIcon.style.display = "none";
+
+    acceptIcon.style.display = "block";
+    rejectIcon.style.display = "block"
+
+  };
+  
+
+  function editedcard() {
+    const editedText = p.textContent.trim();
+    if (editedText === "") {
+      alert("Task cannot be empty!");
+      p.focus();
+      return;
+    }
+      task.text = editedText;
       p.contentEditable = false;
-      task.text = p.textContent;
       saveTasks();
+
+      checkIcon.style.display = "block";
+      editIcon.style.display = task.status === "completed" ? "none" : "block";
+      deleteIcon.style.display = "block";
+
+      acceptIcon.style.display = "none";
+      rejectIcon.style.display = "none";
+  };
+
+    function cancelCard() {
+      p.contentEditable = false;
+      p.textContent = originalText;
+      checkIcon.style.display = "block";
+      editIcon.style.display = task.status === "completed" ? "none" : "block";
+      deleteIcon.style.display = "block";
+
+      acceptIcon.style.display = "none";
+      rejectIcon.style.display = "none";
+     
+    };
+
+    editIcon.addEventListener("click", editTask);
+    acceptIcon.addEventListener("click", editedcard);
+    rejectIcon.addEventListener("click", cancelCard);
+
+    p.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        const editedText = p.textContent.trim();
+        if (editedText === "") {
+          alert("Task cannot be empty!");
+          p.contentEditable = true;
+          return;
+        }
+        p.contentEditable = false;
+        task.text = p.textContent;
+        saveTasks();
+      }
+    });
+
+
+
+    function deleteTask() {
+      taskList.removeChild(wrapper);
+      const index = tasks.findIndex(t => t.id === task.id);
+      if (index !== -1) tasks.splice(index, 1);
+      saveTasks();
+    };
+    deleteIcon.addEventListener("click", deleteTask);
+  }
+  function addTask(text) {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+
+    const newTask = { id: Date.now(), text: trimmed, status: "pending" };
+    tasks.push(newTask);
+    renderTask(newTask);
+    taskInput.value = "";
+    saveTasks();
+    applyFilter();
+  }
+  taskInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      addTask(taskInput.value);
     }
   });
-
-
-
-  function deleteTask() {
-    taskList.removeChild(wrapper);
-    const index = tasks.findIndex(t => t.id === task.id);
-    if (index !== -1) tasks.splice(index, 1);
-    saveTasks();
-  };
-  deleteIcon.addEventListener("click", deleteTask);
-}
-function addTask(text) {
-  const trimmed = text.trim();
-  if (!trimmed) return;
-
-  const newTask = { id: Date.now(), text: trimmed, status: "pending" };
-  tasks.push(newTask);
-  renderTask(newTask);
-  taskInput.value = "";
-  saveTasks();
-  applyFilter();
-}
-taskInput.addEventListener("keydown", (event) => {
-  if (event.key === "Enter" && !event.shiftKey) {
-    event.preventDefault();
+  addBtn.addEventListener("click", () => {
     addTask(taskInput.value);
-  }
-});
-addBtn.addEventListener("click", () => {
-  addTask(taskInput.value);
-});
-tasks.forEach(renderTask);
+  });
+  
+  tasks.forEach(renderTask);
